@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-$2!lzfpp93l02tqlrd*mjp+klr_2nl79-@gf7cb)&@^(z0)3$b
 PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "sausan-farah-leaguelocker.pbp.cs.ui.ac.id"]
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'main'
 ]
 
 MIDDLEWARE = [
