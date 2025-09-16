@@ -1,8 +1,44 @@
-<h1>League Locker</h1>
 
-<h4>App: </h4>
-<p>{{ app }}</p> <!-- Ubah sesuai dengan npm kamu -->
-<h4>Name: </h4>
-<p>{{ name }}</p> <!-- Ubah sesuai dengan nama kamu -->
-<h4>Class: </h4>
-<p>{{ class }}</p> <!-- Ubah sesuai dengan kelas kamu -->
+<h1>Item Store</h1>
+
+<h5>App: </h5>
+<p>{{ app }}</p>
+
+<h5>Name:</h5>
+<p>{{ name }}</p>
+
+<h5>Class:</h5>
+<p>{{ class }}</p>
+
+<a href="{% url 'main:create_item' %}">
+  <button>+ Add Item</button>
+</a>
+
+<hr>
+
+{% if not item_list %}
+<p>Belum ada data item pada store.</p>
+{% else %}
+
+{% for item in item_list %}
+<div>
+  <h2><a href="{% url 'main:show_item' item.id %}">{{ item.name }}</a></h2>
+
+  <p><b>{{ item.category }}</b>{% if item.is_featured %} | 
+    <b>Featured</b>{% endif %} | 
+    <i>Rp{{ item.price }}</i></p>
+
+  {% if item.thumbnail %}
+  <img src="{{ item.thumbnail }}" alt="thumbnail" width="150" height="100">
+  <br />
+  {% endif %}
+
+  <p>{{ item.description|truncatewords:25 }}...</p>
+
+  <p><a href="{% url 'main:show_item' item.id %}"><button>Read More</button></a></p>
+</div>
+
+<hr>
+{% endfor %}
+
+{% endif %}
