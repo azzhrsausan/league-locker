@@ -1,5 +1,6 @@
-
+# -----Tugas 2------ #
 1.  
+    Langkah awal saya dalam mengerjakan Tugas 2 PBP ini adalah menentukan nama project, dan akhirnya saya memilih League Locker. Setelah itu, saya membuat repositori baru di GitHub lalu melakukan clone ke folder lokal. Dari folder hasil clone tersebut, saya membuka command prompt untuk membuat direktori sekaligus mengaktifkan virtual environment. Perintah yang saya gunakan adalah python -m venv env untuk membuat env, lalu env\Scripts\activate untuk mengaktifkannya.
 
     Pada tahap konfigurasi environment, inisiasi schema saya ubah menjadi "tugas_individu". Setelah itu selesai, saya langsung melanjutkan dengan menjalankan server menggunakan perintah python manage.py migrate dan python manage.py runserver.
 
@@ -29,3 +30,29 @@
 6. Terima kasih banyak untuk tim Asdos terutama kak Clarence dan kak Isa yang membantu saya saat tidak dapat membuat aplikasi main pada tutorial 1. 
 
 
+
+
+
+# -----Tugas 3------ #
+1. Data delivery diperlukan agar server dan client dapat saling bertukar informasi, sehingga platform dapat berjalan dengan lancar dan dapat menampilkan data ke pengguna.
+
+2. Mengapa json lebih banyak dipakai sekarang dibanding xml? karena xml ini secara usia lebih tua, lalu memiliki struktur yang tidak mudah, memiliki banyak tag, dan ukurannya yang lebih besar jika dibandingkan dengan json yang lebih simpel, lebih ringan, mudah dibaca manusia dan mesin. Jadi, json lebih populer karena dia lebih praktis dan parsingnya lebih cepat daripada xml.
+
+3. Method is_valid() dipakai untuk mengecek apakah data yang diisi oleh user di form sudah sesuai aturan atau belum. Misal, field harga harus diisi oleh angka atau field tumbnail harus diisi dengan url gambarnya. Kalau is_valid() hasilnya True, berarti data aman untuk disimpan ke database. Kalau tidak, akan muncul error.
+
+4. csrf_token dipakai untuk keamanan form. Dia bakal mencegah serangan yang namanya CSRF (Cross-Site Request Forgery), yaitu kondisi ketika penyerang bikin user tanpa sadar mengirim request berbahaya ke server (misal transfer uang atau ubah password). Kalau tidak pakai csrf_token, penyerang bisa bikin form palsu di website lain, lalu memaksa user login kita untuk submit data ke server kita. Akibatnya, sistem bisa dipakai tanpa izin user yang asli.
+
+5. Langkah awal yang saya lakukan adalah dengan memastikan struktur direktori saya sudah sesuai dengan yang terdapat di tutorial 2. Lalu, saya mengimplementasikan skeleton sebagai kerangka view yang berfungsi untuk memastikan adanya konsistensi dalam desain situs web kita serta memperkecil kemungkinan terjadinya redundansi kode. Lalu, saya lanjut membuat form input data dan menampilkan data dari project saya (league locker) pada HTML dengan membuat struktur forms, membuat beberapa fungsi baru di views.py, lalu routing url di urls.py, serta menambahkan file HTML dengan menyesuaikan beberapa variabel berdasarkan field saya yang terdapat pada models.
+
+Selanjutnya saya melalukan pengembalian data dalam bentuk xml dan json dengan menambahkan beberapa function seperti show_xml dan show_json, tidak lupa juga untuk menambahkan path url di dalam file urls.py. Selain itu, saya juga melakukan pengembalian data berdasarkan ID dalam bentuk xml dan json. Anyway, di dalam field models project saya ini belum terdapat id dari itemnya, jadi saya menambahkan field baru dengan menggunakan uuid dan langsung melakukan migrate. Setelah ID item ada, pada tahap ini saya menambahkan beberapa function yaitu show_xml_by_id dan show_json_by_id, tidak lupa juga untuk menambahkan path url di dalam file urls.py. 
+
+Setelah itu saya mencoba runserver untuk melihat project saya di local host, lalu saya menambahkan item baru di project saya. Dengan kita menambahkan item baru, kita dapat melihat ID dari item tersebut dan melihat data tersebut di Postman. Setelah semua step diatas selesai, selanjutnya saya melakukan push di github dan pws, serta menambahkan item pada project pws saya.
+
+
+6. Terima kasih banyak kakak Asdos telah membantu men-debug kekeliruan saya saat menambahkan news di project PWS. 
+
+7. Berikut merupakan screenshot hasil akses URL pada postman
+xml:
+![alt text](<Screenshot 2025-09-17 003210.png>)
+json:
+![alt text](<Screenshot 2025-09-17 003342.png>)
