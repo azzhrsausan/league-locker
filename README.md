@@ -56,3 +56,25 @@ xml:
 ![alt text](<Screenshot 2025-09-17 003210.png>)
 json:
 ![alt text](<Screenshot 2025-09-17 003342.png>)
+
+
+
+
+
+# -----Tugas 4------ #
+1. AuthenticationForm di Django adalah form bawaan untuk login user, yang sudah ada field username dan password serta validasi otomatis. Kelebihannya gampang dipakai, aman, dan hemat waktu. Kekurangannya agak kaku, jadi kalau butuh kustomisasi lebih jauh biasanya harus bikin form sendiri.
+
+2. Autentikasi itu proses mengecek “kamu siapa”, contohnya login dengan username dan password. Otorisasi itu proses mengecek “kamu boleh ngapain aja”, misalnya user biasa tidak bisa masuk halaman admin. Di Django, autentikasi di-handle lewat fungsi authenticate() dan login(), sementara otorisasi lewat permission dan decorator seperti @login_required.
+
+3. Cookies menyimpan data langsung di browser. Kelebihannya mudah digunakan, tapi kurang aman karena bisa dilihat atau diubah user. Session menyimpan data di server, dan hanya ID session yang disimpan di browser. Kelebihannya lebih aman, tapi butuh resource server lebih banyak karena server harus menyimpan data semua user.
+
+4. Cookies tidak selalu aman secara default, karena bisa dicuri atau diubah lewat serangan seperti XSS. Django membantu mengatasi hal ini dengan menyediakan opsi HttpOnly supaya cookies tidak bisa diakses lewat JavaScript, Secure supaya cookies hanya dikirim lewat HTTPS, dan token CSRF untuk mencegah serangan request palsu.
+
+5. Langkah awal saya dalam mengerjakan tugas 4 ini yaitu dengan membuat fungsi dan form registrasi. Pertama saya memastikan untuk menyalakan virtual environment terlebih dahulu, lalu menambahkan fumgsi register di views dan juga membuat template htmlnya. Setelah itu, saya lanjut membuat fungsi login dengan menambahkan fungsi baru yaitu login_user dan template htmlnya. Selain fungsi login, saya juga membuat fungsi logoutnya dengan menambahkan fungsi baru yaitu logout_user, berbeda dengan login, fungsi logout tidak membuat file template baru, melainkan saya menambahkan button logout di dalam template mainnya. Dari step yang sudah saa sebutkan, tidak lupa juga untuk menambahkan path dari fungsi-fungsi yang baru ditambahkan ke dalam urls.py.
+
+Setelah itu, saya membuat restriksi akses/batas akses ke halaman main dan item detail. Pada function show_main dan show_item saya menambahkan decorator @login_required(login_url='/login') untuk membatasi hanya pengguna yang sudah login yang bisa mengakses main page dan item detail.
+
+Selanjutnya, untuk implementasi cookies, saya melakukan logout dulu, lalu saya menambahkan code baru di function login_user supaya dapat menyimpan cookie last_login. Di function show_main saya ambil cookie itu pakai request.COOKIES.get(), di logout_user saya hapus lagi pakai delete_cookie(). Lalu, di main.html saya tampilkan {{ last_login }}, dan nantinya pas dicek di browser, cookie muncul saat login dan hilang saat logout.
+
+Setelah itu, saya menghubungkan model News ke User dengan ForeignKey, simpan request.user saat buat artikel, lalu filter artikel di show_main agar bisa tampil semua atau hanya milik user login. Di template, saya tambahin tombol filter dan tampilkan nama author.
+

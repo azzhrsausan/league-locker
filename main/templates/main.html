@@ -1,11 +1,11 @@
 
-<h1>Item Store</h1>
+<h1>League Locker</h1>
 
-<h5>App: </h5>
-<p>{{ app }}</p>
-
-<h5>Name:</h5>
+<h5>Name: </h5>
 <p>{{ name }}</p>
+
+<h5>NPM:</h5>
+<p>{{ npm }}</p>
 
 <h5>Class:</h5>
 <p>{{ class }}</p>
@@ -14,7 +14,19 @@
   <button>+ Add Item</button>
 </a>
 
+<a href="{% url 'main:logout' %}">
+  <button>Logout</button>
+</a>
+
+<h5>Sesi terakhir login: {{ last_login }}</h5>
 <hr>
+
+<a href="?filter=all">
+    <button type="button">All Items</button>
+</a>
+<a href="?filter=my">
+    <button type="button">My Items</button>
+</a> 
 
 {% if not item_list %}
 <p>Belum ada data item pada store.</p>
