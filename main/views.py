@@ -108,7 +108,7 @@ def register(request):
 
 def login_user(request):
    if request.method == 'POST':
-      form = AuthenticationForm(data=request.POST)
+      form = AuthenticationForm(request, data=request.POST) #ini diganti
 
       if form.is_valid():
         user = form.get_user()
@@ -118,7 +118,7 @@ def login_user(request):
         return response
 
    else:
-      form = AuthenticationForm(request)
+      form = AuthenticationForm() #ini juga parameter req nya diilangin
    context = {'form': form}
    return render(request, 'login.html', context)
 
@@ -127,3 +127,21 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse('main:login'))
     response.delete_cookie('last_login')
     return response
+
+def edit_item(request, id):
+    item = get_object_or_404(Item, pk=id)
+    form = ItemForm(request.POST or None, instance=item)
+    if form.is_valid() and request.method == 'POST':
+        form.save()
+        return redirect('main:show_main')
+
+    context = {
+        'form': form
+    }
+
+    return render(request, "edit_item.html", context)
+
+def delete_item(request, id):
+    item = get_object_or_404(Item, pk=id)
+    item.delete()
+    return HttpResponseRedirect(reverse('main:show_main'))

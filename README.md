@@ -78,3 +78,18 @@ Selanjutnya, untuk implementasi cookies, saya melakukan logout dulu, lalu saya m
 
 Setelah itu, saya menghubungkan model News ke User dengan ForeignKey, simpan request.user saat buat artikel, lalu filter artikel di show_main agar bisa tampil semua atau hanya milik user login. Di template, saya tambahin tombol filter dan tampilkan nama author.
 
+
+
+
+# -----Tugas 5------ #
+1. Kalau ada beberapa CSS yang diterapkan ke elemen yang sama, browser bakal milih style mana yang dipakai berdasarkan prioritasnya. Yang paling tinggi itu inline style, yaitu style yang langsung ditulis di atribut style pada elemen. Setelah itu, selector dengan ID (#id) lebih diutamakan dibanding class atau tag. Berikutnya, class, attribute, dan pseudo-class punya prioritas sedang, sedangkan type atau tag selector prioritasnya paling rendah. Nah, kalau ada !important, biasanya itu bakal menimpa aturan lain, kecuali ada !important lain yang lebih spesifik. Contohnya, kalau sebuah paragraf punya inline style, ID, dan class, warna teksnya bakal ikut inline style karena memang prioritasnya paling tinggi.
+
+2. Responsive design berarti tampilan website bisa menyesuaikan ukuran layar, baik di desktop, tablet, maupun smartphone. Konsep ini penting karena orang mengakses website melalui berbagai perangkat, dan tampilan yang tidak responsif bisa membuat konten sulit dibaca atau tombol sulit diklik. Contohnya, aplikasi seperti Tokopedia dan Instagram sudah menerapkan responsive design sehingga tampilannya rapi di semua ukuran layar. Sedangkan website lama universitas atau toko kecil yang hanya menggunakan layout desktop masih belum responsif, sehingga ketika dibuka di HP kontennya terlalu kecil atau harus scroll horizontal.
+
+3. Margin, border, dan padding itu bagian dari box model di CSS yang ngatur jarak elemen. Margin itu jarak di luar elemen buat memisahkan elemen satu sama lain. Border adalah garis yang ngelilingi elemen. Sedangkan padding itu jarak di dalam elemen, antara konten dan border. Ketiganya bisa diatur pakai CSS, misalnya margin: 20px; border: 2px solid black; padding: 10px;, jadi elemen kelihatan rapi dengan jarak yang pas antar elemen dan antara konten sama batasnya.
+
+4. Flexbox dan grid itu cara buat ngatur layout di CSS. Flexbox cocok buat layout satu dimensi, misalnya baris atau kolom, jadi elemen bisa diatur rata tengah, jarak antar item merata, atau urutannya bisa diubah. Biasanya dipakai buat navbar atau row card. Sementara grid layout lebih untuk layout dua dimensi, baris dan kolom, cocok buat dashboard atau galeri. Dengan grid, kita bisa tentuin jumlah kolom, tinggi baris, dan jarak antar elemen dengan mudah. Jadi intinya, kedua konsep ini bikin tampilan web lebih rapi dan terstruktur.
+
+5. Yang saya lakukan pertama kali saat mengerjakan tugas 5 ini yaitu dengan menambahkan framework css yaitu Tailwind. Lalu, saya menambahkan fitur edit item dan juga delete item dengan menambahkan fungsi edit_news dan delete_news di views.py. Selanjutnya saya menambahkan navbar, kalo dari tutotial bedanya saya nambahin logo dengan memakai <img> dari folder static, trus saya taruh logonya disamping nama webnya. Lalu saya juga melakukan konfigurasi static files dengan menambahkan middleware WhiteNoise di settings.py. 
+
+Selanjutnya saya melakukan styling menggunakan Tailwind dan external CSS dengan menambahkan file global.css di dalam folder static. Beberapa yang saya ubah yaitu design color dari web saya. Selanjutnya saya melakukan styling pada navbar, login page, register page, home page, detail item page, create item page, dan juga edit item page. 

@@ -1,56 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
 
-<h1>League Locker</h1>
+{% block meta %}
+<title>League Locker - Items</title>
+{% endblock meta %}
 
-<h5>Name: </h5>
-<p>{{ name }}</p>
+{% block content %}
+{% include 'navbar.html' %}
 
-<h5>NPM:</h5>
-<p>{{ npm }}</p>
+<div class="bg-[#F9F0EE] w-full pt-16 min-h-screen"> <!-- beige background sama kayak login/register -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-<h5>Class:</h5>
-<p>{{ class }}</p>
+    <!-- Header Section -->
+    <div class="mb-8 text-center">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">League Locker Store</h1>
+      <p class="text-gray-600">Browse, manage, and feature your football items</p>
+    </div>
 
-<a href="{% url 'main:create_item' %}">
-  <button>+ Add Item</button>
-</a>
+    <!-- Filter Section -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+      <div class="flex space-x-3 mb-4 sm:mb-0">
+        <a href="?filter=all" 
+           class="{% if request.GET.filter == 'all' or not request.GET.filter  %} bg-[#0A1E54] text-white{% else %}bg-white text-gray-700 border border-gray-300{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-[#0C276E] hover:text-white">
+          All Items
+        </a>
+        <a href="?filter=my" 
+           class="{% if request.GET.filter == 'my' %} bg-[#0A1E54] text-white{% else %}bg-white text-gray-700 border border-gray-300{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-[#0C276E] hover:text-white">
+          My Items
+        </a>
+      </div>
+      {% if user.is_authenticated %}
+        <div class="text-sm text-gray-500">
+          Last login: {{ last_login }}
+        </div>
+      {% endif %}
+    </div>
 
-<a href="{% url 'main:logout' %}">
-  <button>Logout</button>
-</a>
-
-<h5>Sesi terakhir login: {{ last_login }}</h5>
-<hr>
-
-<a href="?filter=all">
-    <button type="button">All Items</button>
-</a>
-<a href="?filter=my">
-    <button type="button">My Items</button>
-</a> 
-
-{% if not item_list %}
-<p>Belum ada data item pada store.</p>
-{% else %}
-
-{% for item in item_list %}
-<div>
-  <h2><a href="{% url 'main:show_item' item.id %}">{{ item.name }}</a></h2>
-
-  <p><b>{{ item.category }}</b>{% if item.is_featured %} | 
-    <b>Featured</b>{% endif %} | 
-    <i>Rp{{ item.price }}</i></p>
-
-  {% if item.thumbnail %}
-  <img src="{{ item.thumbnail }}" alt="thumbnail" width="150" height="100">
-  <br />
-  {% endif %}
-
-  <p>{{ item.description|truncatewords:25 }}...</p>
-
-  <p><a href="{% url 'main:show_item' item.id %}"><button>Read More</button></a></p>
+    <!-- Items Grid -->
+    {% if not item_list %}
+      <div class="bg-white rounded-lg border border-gray-200 p-12 text-center shadow-sm">
+        <div class="w-32 h-32 mx-auto mb-4">
+          <img src="{% static 'image/no-item.png' %}" alt="No items available" class="w-full h-full object-contain">
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No items found</h3>
+        <p class="text-gray-500 mb-6">Be the first to add items to the store.</p>
+        <a href="{% url 'main:create_item' %}" 
+           class="inline-flex items-center px-4 py-2 bg-[#0A1E54] text-white rounded-md hover:bg-[#0C276E] transition-colors">
+          + Add Item
+        </a>
+      </div>
+    {% else %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for item in item_list %}
+          {% include 'card_item.html' with item=item %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
 </div>
-
-<hr>
-{% endfor %}
-
-{% endif %}
+{% endblock content %}
