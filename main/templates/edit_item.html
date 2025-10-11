@@ -23,7 +23,7 @@
         <p class="text-gray-600">Update your item details below</p>
       </div>
       
-      <form method="POST" class="space-y-6">
+      <form id="edit-item-form" method="POST" class="space-y-6">
         {% csrf_token %}
         {% for field in form %}
           <div>
@@ -47,12 +47,73 @@
           <a href="{% url 'main:show_main' %}" class="order-2 sm:order-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors text-center">
             Cancel
           </a>
-          <button type="submit" class="order-1 sm:order-2 flex-1 bg-[#0A1E54] text-white px-6 py-3 rounded-md font-medium hover:bg-green-700 transition-colors">
+          <button type="submit" id="submit-btn" class="order-1 sm:order-2 flex-1 bg-[#0A1E54] text-white px-6 py-3 rounded-md font-medium hover:bg-green-700 transition-colors">
             Update Item
           </button>
         </div>
       </form>
+
+      <!-- ✅ Feedback message -->
+      <p id="form-feedback" class="text-center text-sm mt-4 hidden"></p>
     </div>
   </div>
 </div>
+
+<!-- ✅ AJAX Script -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("edit-item-form");
+  const submitBtn = document.getElementById("submit-btn");
+  const feedback = document.getElementById("form-feedback");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault(); // cegah reload halaman
+
+    const formData = new FormData(form);
+    const originalText = submitBtn.textContent;
+
+    // Ubah teks tombol jadi loading
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Updating...";
+
+    fetch(window.location.href, {  // ⬅️ kirim ke URL edit sekarang (/edit/<id>/)
+      method: "POST",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "success") {
+        feedback.classList.remove("hidden");
+        feedback.classList.remove("text-red-600");
+        feedback.classList.add("text-green-600", "font-medium");
+        feedback.textContent = "✅ Item updated successfully!";
+
+        // Redirect setelah sedikit delay
+        setTimeout(() => {
+          window.location.href = "{% url 'main:show_main' %}";
+        }, 1000);
+      } else {
+        feedback.classList.remove("hidden");
+        feedback.classList.remove("text-green-600");
+        feedback.classList.add("text-red-600", "font-medium");
+        feedback.textContent = "⚠️ Failed to update item. Please check your input.";
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      feedback.classList.remove("hidden");
+      feedback.classList.remove("text-green-600");
+      feedback.classList.add("text-red-600", "font-medium");
+      feedback.textContent = "⚠️ Something went wrong.";
+    })
+    .finally(() => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    });
+  });
+});
+</script>
 {% endblock %}

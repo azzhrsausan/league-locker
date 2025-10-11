@@ -22,7 +22,7 @@
         <p class="text-gray-600">Fill in the details below to add a new item to your store.</p>
       </div>
       
-      <form method="POST" class="space-y-6">
+      <form id="create-item-form" method="POST" class="space-y-6">
         {% csrf_token %}
         {% for field in form %}
           <div>
@@ -47,12 +47,76 @@
           <a href="{% url 'main:show_main' %}" class="order-2 sm:order-1 px-6 py-3 border border-[#B39A84] text-[#0A1E54] rounded-md font-medium hover:bg-[#F3EEE9] transition-colors text-center">
             Cancel
           </a>
-          <button type="submit" class="order-1 sm:order-2 flex-1 bg-[#0A1E54] text-white px-6 py-3 rounded-md font-medium hover:bg-[#0C276E] focus:outline-none focus:ring-2 focus:ring-[#0A1E54] transition-colors">
+          <button type="submit" id="submit-btn" class="order-1 sm:order-2 flex-1 bg-[#0A1E54] text-white px-6 py-3 rounded-md font-medium hover:bg-[#0C276E] focus:outline-none focus:ring-2 focus:ring-[#0A1E54] transition-colors">
             Add Item
           </button>
         </div>
       </form>
+
+      <!-- TEMPAT FEEDBACK (tidak mengubah layout) -->
+      <p id="form-feedback" class="text-center text-sm mt-4 hidden"></p>
     </div>
   </div>
 </div>
+
+<!-- ✅ SCRIPT AJAX -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("create-item-form");
+  const submitBtn = document.getElementById("submit-btn");
+  const feedback = document.getElementById("form-feedback");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault(); // cegah reload halaman
+
+    const formData = new FormData(form);
+
+    // tampilkan status loading di tombol
+    submitBtn.disabled = true;
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = "Submitting...";
+
+    // kirim AJAX ke Django
+    fetch("{% url 'main:create_item' %}", {
+      method: "POST",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "success") {
+        feedback.classList.remove("hidden");
+        feedback.classList.remove("text-red-600");
+        feedback.classList.add("text-green-600", "font-medium");
+        feedback.textContent = "✅ Item successfully added!";
+        form.reset();
+
+        // redirect setelah 1 detik
+        setTimeout(() => {
+          window.location.href = "{% url 'main:show_main' %}";
+        }, 1000);
+      } else {
+        feedback.classList.remove("hidden");
+        feedback.classList.remove("text-green-600");
+        feedback.classList.add("text-red-600", "font-medium");
+        feedback.textContent = "⚠️ Failed to create item. Please check your input.";
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      feedback.classList.remove("hidden");
+      feedback.classList.remove("text-green-600");
+      feedback.classList.add("text-red-600", "font-medium");
+      feedback.textContent = "⚠️ Something went wrong.";
+    })
+    .finally(() => {
+      // kembalikan tombol seperti semula
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    });
+  });
+});
+</script>
 {% endblock %}

@@ -7,8 +7,9 @@
 
 {% block content %}
 {% include 'navbar.html' %}
+{% include 'create_modal.html' %}
 
-<div class="bg-[#F9F0EE] w-full pt-16 min-h-screen"> <!-- beige background sama kayak login/register -->
+<div class="bg-[#F9F0EE] w-full pt-16 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Header Section -->
@@ -17,15 +18,33 @@
       <p class="text-gray-600">Browse, manage, and feature your football items</p>
     </div>
 
+    <!-- Button to open modal -->
+    <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-[#F2F2F2] text-[#0A1E54] font-semibold outline outline-2 outline-[#0A1E54] outline-offset-[-2px] rounded-md hover:bg-[#0C276E] hover:text-white transition-colors mb-4">
+      Create Item by AJAX
+    </button>
+
+    <!-- Button to open modal -->
+    <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-[#F2F2F2] text-[#0A1E54] font-semibold outline outline-2 outline-[#0A1E54] outline-offset-[-2px] rounded-md hover:bg-[#0C276E] hover:text-white transition-colors mb-4">
+      Update Item by AJAX
+    </button>
+
+    <button onclick="refreshItems()" class="inline-flex items-center px-4 py-2 bg-[#F2F2F2] text-[#0A1E54] font-semibold border border-2 border-[#0A1E54] rounded-md hover:bg-[#0C276E] hover:text-white transition-colors">
+      🔄 Refresh Items
+    </button>
+
+    <div id="item-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <!-- item cards bakal ditaro di sini via AJAX -->
+    </div>
+
     <!-- Filter Section -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
       <div class="flex space-x-3 mb-4 sm:mb-0">
-        <a href="?filter=all" 
-           class="{% if request.GET.filter == 'all' or not request.GET.filter  %} bg-[#0A1E54] text-white{% else %}bg-white text-gray-700 border border-gray-300{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-[#0C276E] hover:text-white">
+        <a id="filter-all"
+           class="bg-[#0A1E54] text-white px-4 py-2 rounded-md font-medium transition-colors hover:bg-[#0C276E] hover:text-white cursor-pointer">
           All Items
         </a>
-        <a href="?filter=my" 
-           class="{% if request.GET.filter == 'my' %} bg-[#0A1E54] text-white{% else %}bg-white text-gray-700 border border-gray-300{% endif %} px-4 py-2 rounded-md font-medium transition-colors hover:bg-[#0C276E] hover:text-white">
+        <a id="filter-my"
+           class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md font-medium transition-colors hover:bg-[#0C276E] hover:text-white cursor-pointer">
           My Items
         </a>
       </div>
@@ -36,26 +55,202 @@
       {% endif %}
     </div>
 
+    <!-- Loading State -->
+    <div id="loading" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden shadow-sm">
+      <svg class="animate-spin h-8 w-8 text-[#0A1E54] inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <p class="text-gray-600 mt-3">Loading items...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="error" class="hidden bg-white rounded-lg border border-red-200 p-8 text-center shadow-sm text-red-600 font-medium">
+      An error occurred while loading items. Please try again later.
+    </div>
+
     <!-- Items Grid -->
-    {% if not item_list %}
-      <div class="bg-white rounded-lg border border-gray-200 p-12 text-center shadow-sm">
-        <div class="w-32 h-32 mx-auto mb-4">
-          <img src="{% static 'image/no-item.png' %}" alt="No items available" class="w-full h-full object-contain">
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No items found</h3>
-        <p class="text-gray-500 mb-6">Be the first to add items to the store.</p>
-        <a href="{% url 'main:create_item' %}" 
-           class="inline-flex items-center px-4 py-2 bg-[#0A1E54] text-white rounded-md hover:bg-[#0C276E] transition-colors">
-          + Add Item
-        </a>
+    <div id="grid" class="hidden"></div>
+
+    <!-- Empty State -->
+    <div id="empty" class="bg-white rounded-lg border border-gray-200 p-12 text-center hidden shadow-sm">
+      <div class="w-32 h-32 mx-auto mb-4">
+        <img src="{% static 'image/no-item.png' %}" alt="No items available" class="w-full h-full object-contain">
       </div>
-    {% else %}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for item in item_list %}
-          {% include 'card_item.html' with item=item %}
-        {% endfor %}
-      </div>
-    {% endif %}
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No items found</h3>
+      <p class="text-gray-500 mb-6">Be the first to add items to the store.</p>
+      <a href="{% url 'main:create_item' %}" 
+         class="inline-flex items-center px-4 py-2 bg-[#0A1E54] text-white rounded-md hover:bg-[#0C276E] transition-colors">
+        + Add Item
+      </a>
+    </div>
   </div>
 </div>
+
+<!-- Script AJAX -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const loading = document.getElementById("loading");
+  const errorDiv = document.getElementById("error");
+  const grid = document.getElementById("grid");
+  const empty = document.getElementById("empty");
+  const filterAll = document.getElementById("filter-all");
+  const filterMy = document.getElementById("filter-my");
+
+  async function loadItems(filter = "all") {
+    loading.classList.remove("hidden");
+    errorDiv.classList.add("hidden");
+    grid.classList.add("hidden");
+    empty.classList.add("hidden");
+
+    try {
+      const response = await fetch("{% url 'main:show_json' %}");
+      if (!response.ok) throw new Error("Failed to fetch JSON");
+      const data = await response.json();
+
+      loading.classList.add("hidden");
+
+      if (!data || data.length === 0) {
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      const currentUserId = "{{ user.id }}";
+      const isAuthenticated = "{{ user.is_authenticated }}" === "True";
+
+      let cards = "";
+
+      data.forEach(item => {
+        if (filter === "my" && item.user_id != currentUserId) return;
+
+        cards += `
+          <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col">
+
+            <!-- Thumbnail -->
+            ${item.thumbnail
+              ? `<div class='w-full h-48 bg-gray-100 flex items-center justify-center'>
+                  <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-full object-cover rounded-none">
+                </div>`
+              : `<div class='w-full h-48 bg-gray-100 flex items-center justify-center text-gray-400'>
+                  <img src="{% static 'images/no-items.png' %}" alt="No Image" class="w-16 h-16 opacity-70">
+                </div>`
+            }
+
+            <!-- Card Body -->
+            <div class="p-5 flex-1 flex flex-col">
+              <h2 class="text-lg font-semibold text-gray-900 mb-2">
+                <a href="/item/${item.id}/" class="hover:text-[#0A1E54] transition-colors">
+                  ${item.name}
+                </a>
+              </h2>
+
+              <p class="text-sm text-gray-500 mb-3">
+                <b>${item.category}</b>
+                ${item.is_featured ? `<span class="ml-2 px-2 py-1 text-xs bg-[#B39A84] text-white rounded">Featured</span>` : ""}
+              </p>
+
+              <p class="text-[#0A1E54] font-bold mb-3">Rp${item.price_formatted || item.price}</p>
+
+              <p class="text-gray-600 text-sm mb-4 flex-1">
+                ${item.description.split(" ").slice(0, 20).join(" ")}...
+              </p>
+
+              <div class="flex flex-col space-y-3 mt-auto">
+                <a href="/item/${item.id}/" 
+                   class="w-full text-center text-sm px-3 py-2 rounded bg-[#0A1E54] text-white hover:bg-[#0C276E] transition-colors">
+                  Read More
+                </a>
+
+                ${isAuthenticated && item.user_id == currentUserId ? `
+                  <div class="flex gap-4">
+                    <a href="/item/${item.id}/edit" 
+                      class="flex-1 text-center text-sm px-3 py-2 rounded bg-[#FFE4A1] text-gray-900 hover:bg-[#e6cc84] transition-colors">
+                      Edit
+                    </a>
+                    <a href="/item/${item.id}/delete" 
+                      class="flex-1 text-center text-sm px-3 py-2 rounded bg-[#97322D] text-white hover:bg-[#7a2824] transition-colors">
+                      Delete
+                    </a>
+                  </div>
+                ` : ""}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      if (!cards.trim()) {
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      grid.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${cards}</div>`;
+      grid.classList.remove("hidden");
+
+    } catch (err) {
+      console.error("❌ ERROR FETCH:", err);
+      loading.classList.add("hidden");
+      errorDiv.classList.remove("hidden");
+    }
+  }
+
+  filterAll.addEventListener("click", () => {
+    filterAll.classList.add("bg-[#0A1E54]", "text-white");
+    filterMy.classList.remove("bg-[#0A1E54]", "text-white");
+    loadItems("all");
+  });
+
+  filterMy.addEventListener("click", () => {
+    filterMy.classList.add("bg-[#0A1E54]", "text-white");
+    filterAll.classList.remove("bg-[#0A1E54]", "text-white");
+    loadItems("my");
+  });
+
+  // 🔔 Event listener untuk deteksi item baru dari create_modal.html
+  document.addEventListener('itemAdded', function() {
+      // Refresh data tanpa reload halaman
+      if (typeof refreshItems === "function") {
+          refreshItems();  // panggil fungsi yang udah kamu pakai buat load ulang item dari AJAX
+      } else {
+          console.warn("⚠️ Fungsi refreshItems belum didefinisikan di main.html");
+      }
+  });
+
+  async function refreshItems() {
+    try {
+      const response = await fetch("{% url 'main:show_json' %}");
+      const items = await response.json();
+
+      const container = document.getElementById("item-container");
+      container.innerHTML = "";
+
+      items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "bg-white border border-[#B39A84] rounded-lg shadow-sm p-5 hover:shadow-md transition";
+
+        card.innerHTML = `
+          <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-48 object-cover rounded-md mb-4">
+          <h3 class="text-lg font-semibold text-[#0A1E54] mb-1">${item.name}</h3>
+          <p class="text-sm text-gray-600 mb-2">${item.category}</p>
+          <p class="text-gray-800 font-medium mb-2">Rp ${item.price_formatted}</p>
+          <p class="text-sm text-gray-500">${item.description}</p>
+        `;
+
+        container.appendChild(card);
+      });
+    } catch (error) {
+      console.error("❌ Gagal refresh items:", error);
+    }
+  }
+
+  // biar otomatis refresh setelah nambah item via modal
+  document.addEventListener("itemAdded", refreshItems);
+
+  // optional: auto load data pertama kali
+  document.addEventListener("DOMContentLoaded", refreshItems);
+
+  loadItems("all");
+});
+</script>
+
 {% endblock content %}

@@ -93,3 +93,16 @@ Setelah itu, saya menghubungkan model News ke User dengan ForeignKey, simpan req
 5. Yang saya lakukan pertama kali saat mengerjakan tugas 5 ini yaitu dengan menambahkan framework css yaitu Tailwind. Lalu, saya menambahkan fitur edit item dan juga delete item dengan menambahkan fungsi edit_news dan delete_news di views.py. Selanjutnya saya menambahkan navbar, kalo dari tutotial bedanya saya nambahin logo dengan memakai <img> dari folder static, trus saya taruh logonya disamping nama webnya. Lalu saya juga melakukan konfigurasi static files dengan menambahkan middleware WhiteNoise di settings.py. 
 
 Selanjutnya saya melakukan styling menggunakan Tailwind dan external CSS dengan menambahkan file global.css di dalam folder static. Beberapa yang saya ubah yaitu design color dari web saya. Selanjutnya saya melakukan styling pada navbar, login page, register page, home page, detail item page, create item page, dan juga edit item page. 
+
+
+
+# -----Tugas 6------ #
+1. Synchronous request artinya ketika kita kirim data ke server, halaman akan berhenti dan nunggu sampai server balas, baru lanjut. Biasanya halaman akan reload. Sedangkan asynchronous request (kayak AJAX) bisa kirim data ke server tanpa harus reload halaman. Jadi prosesnya jalan di belakang layar dan pengguna bisa tetap pakai websitenya.
+
+2. AJAX bekerja dengan cara JavaScript ngirim data ke server Django lewat fetch atau request lain. Django nerima data itu di view, terus ngolahnya (misalnya nyimpan ke database) dan balas balik dalam bentuk JSON. JavaScript di halaman web lalu baca balasannya dan langsung ubah tampilan tanpa reload halaman.
+
+3. Pakai AJAX itu lebih cepat karena nggak perlu muat ulang halaman. Website juga terasa lebih interaktif, misalnya data bisa langsung muncul setelah dikirim. Selain itu, pengalaman pengguna jadi lebih enak karena nggak perlu nunggu lama.
+
+4. Supaya aman, AJAX harus tetap pakai CSRF token biar Django tahu request-nya valid. Selain itu, data dikirim lewat HTTPS biar nggak mudah disadap. Dan yang paling penting, validasi tetap dilakukan di server, bukan cuma di frontend.
+
+5. AJAX bikin website terasa lebih cepat dan responsif karena nggak perlu reload. Pengguna juga lebih nyaman karena semua perubahan bisa langsung muncul di halaman. Jadi pengalaman pakai websitenya jadi lebih lancar dan modern.
