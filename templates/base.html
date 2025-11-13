@@ -2,16 +2,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    {% block meta %} {% endblock meta %}
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {% block meta %}{% endblock meta %}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
 </head>
-
 <body>
-    {% block content %} {% endblock content %}
-    {% include 'toast.html' %}
-    {% include 'create_modal.html' %}
+  {% block content %}{% endblock content %}
+  {% include 'toast.html' %}
+  {% include 'create_modal.html' %}
+  {% include 'update_modal.html' %}
+  {% include 'delete_modal.html' %}
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('logged_out') === '1') {
+        showToast('Logged out','Kamu sudah keluar','info');
+      }
+    });
+  </script>
 </body>
 </html>

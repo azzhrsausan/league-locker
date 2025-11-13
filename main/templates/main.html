@@ -7,7 +7,6 @@
 
 {% block content %}
 {% include 'navbar.html' %}
-{% include 'create_modal.html' %}
 
 <div class="bg-[#F9F0EE] w-full pt-16 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -23,12 +22,7 @@
       Create Item by AJAX
     </button>
 
-    <!-- Button to open modal -->
-    <button onclick="showModal()" class="inline-flex items-center px-4 py-2 bg-[#F2F2F2] text-[#0A1E54] font-semibold outline outline-2 outline-[#0A1E54] outline-offset-[-2px] rounded-md hover:bg-[#0C276E] hover:text-white transition-colors mb-4">
-      Update Item by AJAX
-    </button>
-
-    <button onclick="refreshItems()" class="inline-flex items-center px-4 py-2 bg-[#F2F2F2] text-[#0A1E54] font-semibold border border-2 border-[#0A1E54] rounded-md hover:bg-[#0C276E] hover:text-white transition-colors">
+    <button id="refresh-btn" class="inline-flex items-center px-4 py-2 bg-[#F2F2F2] text-[#0A1E54] font-semibold border border-2 border-[#0A1E54] rounded-md hover:bg-[#0C276E] hover:text-white transition-colors">
       🔄 Refresh Items
     </button>
 
@@ -96,8 +90,13 @@ document.addEventListener("DOMContentLoaded", function() {
   const empty = document.getElementById("empty");
   const filterAll = document.getElementById("filter-all");
   const filterMy = document.getElementById("filter-my");
+  const refreshBtn = document.getElementById("refresh-btn");
+
+  let currentFilter = "all";
 
   async function loadItems(filter = "all") {
+    currentFilter = filter;
+
     loading.classList.remove("hidden");
     errorDiv.classList.add("hidden");
     grid.classList.add("hidden");
@@ -119,24 +118,21 @@ document.addEventListener("DOMContentLoaded", function() {
       const isAuthenticated = "{{ user.is_authenticated }}" === "True";
 
       let cards = "";
-
       data.forEach(item => {
-        if (filter === "my" && item.user_id != currentUserId) return;
+        if (currentFilter === "my" && item.user_id != currentUserId) return;
 
         cards += `
           <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex flex-col">
 
-            <!-- Thumbnail -->
             ${item.thumbnail
               ? `<div class='w-full h-48 bg-gray-100 flex items-center justify-center'>
                   <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-full object-cover rounded-none">
                 </div>`
               : `<div class='w-full h-48 bg-gray-100 flex items-center justify-center text-gray-400'>
-                  <img src="{% static 'images/no-items.png' %}" alt="No Image" class="w-16 h-16 opacity-70">
+                  <img src="{% static 'image/no-item.png' %}" alt="No Image" class="w-16 h-16 opacity-70">
                 </div>`
             }
 
-            <!-- Card Body -->
             <div class="p-5 flex-1 flex flex-col">
               <h2 class="text-lg font-semibold text-gray-900 mb-2">
                 <a href="/item/${item.id}/" class="hover:text-[#0A1E54] transition-colors">
@@ -163,14 +159,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 ${isAuthenticated && item.user_id == currentUserId ? `
                   <div class="flex gap-4">
-                    <a href="/item/${item.id}/edit" 
+                    <button onclick="showUpdateModal('${item.id}')" 
                       class="flex-1 text-center text-sm px-3 py-2 rounded bg-[#FFE4A1] text-gray-900 hover:bg-[#e6cc84] transition-colors">
                       Edit
-                    </a>
-                    <a href="/item/${item.id}/delete" 
+                    </button>
+                    <button onclick="showDeleteModal('${item.id}')" 
                       class="flex-1 text-center text-sm px-3 py-2 rounded bg-[#97322D] text-white hover:bg-[#7a2824] transition-colors">
                       Delete
-                    </a>
+                    </button>
                   </div>
                 ` : ""}
               </div>
@@ -194,6 +190,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
+  // filter buttons
   filterAll.addEventListener("click", () => {
     filterAll.classList.add("bg-[#0A1E54]", "text-white");
     filterMy.classList.remove("bg-[#0A1E54]", "text-white");
@@ -206,49 +203,16 @@ document.addEventListener("DOMContentLoaded", function() {
     loadItems("my");
   });
 
-  // 🔔 Event listener untuk deteksi item baru dari create_modal.html
-  document.addEventListener('itemAdded', function() {
-      // Refresh data tanpa reload halaman
-      if (typeof refreshItems === "function") {
-          refreshItems();  // panggil fungsi yang udah kamu pakai buat load ulang item dari AJAX
-      } else {
-          console.warn("⚠️ Fungsi refreshItems belum didefinisikan di main.html");
-      }
-  });
+  // refresh button -> muat ulang list sesuai filter aktif
+  refreshBtn.addEventListener("click", () => loadItems(currentFilter));
 
-  async function refreshItems() {
-    try {
-      const response = await fetch("{% url 'main:show_json' %}");
-      const items = await response.json();
-
-      const container = document.getElementById("item-container");
-      container.innerHTML = "";
-
-      items.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "bg-white border border-[#B39A84] rounded-lg shadow-sm p-5 hover:shadow-md transition";
-
-        card.innerHTML = `
-          <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-48 object-cover rounded-md mb-4">
-          <h3 class="text-lg font-semibold text-[#0A1E54] mb-1">${item.name}</h3>
-          <p class="text-sm text-gray-600 mb-2">${item.category}</p>
-          <p class="text-gray-800 font-medium mb-2">Rp ${item.price_formatted}</p>
-          <p class="text-sm text-gray-500">${item.description}</p>
-        `;
-
-        container.appendChild(card);
-      });
-    } catch (error) {
-      console.error("❌ Gagal refresh items:", error);
-    }
-  }
-
-  // biar otomatis refresh setelah nambah item via modal
+  // event dari modal
+  function refreshItems() { loadItems(currentFilter); }
   document.addEventListener("itemAdded", refreshItems);
+  document.addEventListener("itemUpdated", refreshItems);
+  document.addEventListener("itemDeleted", refreshItems);
 
-  // optional: auto load data pertama kali
-  document.addEventListener("DOMContentLoaded", refreshItems);
-
+  // load awal
   loadItems("all");
 });
 </script>

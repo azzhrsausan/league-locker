@@ -1,0 +1,51 @@
+<div id="deleteModal" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-black bg-opacity-40">
+  <div id="deleteModalContent" class="bg-white rounded-lg border border-[#B39A84] shadow-lg w-11/12 sm:w-96 transform scale-95 opacity-0 transition-all duration-150">
+    <div class="p-6">
+      <h3 class="text-lg font-bold text-[#0A1E54] mb-2">Hapus item ini</h3>
+      <p class="text-gray-600 mb-4">Aksi ini tidak bisa dibatalkan</p>
+      <input type="hidden" id="delete-id">
+      <div class="flex gap-3">
+        <button type="button" class="flex-1 px-4 py-2 border border-[#B39A84] rounded" onclick="hideDeleteModal()">Batal</button>
+        <button type="button" id="confirm-delete-btn" class="flex-1 px-4 py-2 bg-[#97322D] text-white rounded">Hapus</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showDeleteModal(id) {
+    document.getElementById('delete-id').value = id;
+    const m = document.getElementById('deleteModal');
+    const c = document.getElementById('deleteModalContent');
+    m.classList.remove('hidden');
+    setTimeout(() => { c.classList.remove('opacity-0','scale-95'); c.classList.add('opacity-100','scale-100'); }, 50);
+  }
+  function hideDeleteModal() {
+    const m = document.getElementById('deleteModal');
+    const c = document.getElementById('deleteModalContent');
+    c.classList.remove('opacity-100','scale-100');
+    c.classList.add('opacity-0','scale-95');
+    setTimeout(() => m.classList.add('hidden'), 150);
+  }
+
+  document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+    const id = document.getElementById('delete-id').value;
+    try {
+      const res = await fetch(`/item/${id}/delete`, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+      if (!res.ok) throw new Error('fail');
+      const data = await res.json().catch(() => ({ status: 'success' }));
+      if (data.status === 'success') {
+        hideDeleteModal();
+        document.dispatchEvent(new CustomEvent('itemDeleted'));
+        showToast('Deleted','Item telah dihapus','info');
+      } else {
+        throw new Error('fail');
+      }
+    } catch(e) {
+      showToast('Error','Gagal menghapus item','error');
+    }
+  });
+</script>

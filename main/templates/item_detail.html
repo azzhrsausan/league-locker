@@ -8,36 +8,37 @@
 {% block content %}
 {% include 'navbar.html' %}
 
-<div class="bg-[#F5F5DC] w-full pt-16 min-h-screen"> <!-- beige background -->
+<!-- Samakan background dan warna border/aksen -->
+<div class="bg-[#F9F0EE] w-full pt-16 min-h-screen">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
     <!-- Back Button -->
     <div class="mb-6">
-      <a href="{% url 'main:show_main' %}" 
-         class="inline-flex items-center text-[#0A1E54] hover:underline font-medium">
+      <a href="{% url 'main:show_main' %}"
+         class="inline-flex items-center text-[#0A1E54] hover:text-[#0C276E] font-medium transition-colors">
         ← Back to Item List
       </a>
     </div>
 
     <!-- Item Card -->
-    <div id="item-detail" class="bg-white rounded-lg border border-[#B39A84] shadow p-6 md:p-10">
+    <div id="item-detail" class="bg-white rounded-lg border border-[#B39A84] shadow-sm p-6 md:p-10">
       <!-- Header -->
       <div class="mb-6">
         <h1 id="item-name" class="text-3xl font-bold text-[#0A1E54] mb-2">{{ item.name }}</h1>
         <p class="text-gray-600">
           <span id="item-category" class="font-medium">{{ item.category }}</span>
           {% if item.is_featured %}
-            <span id="item-featured" class="ml-2 px-2 py-1 text-xs font-semibold rounded bg-yellow-100 text-yellow-800">Featured</span>
+            <span id="item-featured"
+                  class="ml-2 px-2 py-1 text-xs font-semibold rounded bg-[#B39A84] text-white">Featured</span>
           {% endif %}
-          <span id="item-price" class="ml-2 text-lg font-semibold text-green-700">Rp{{ item.price }}</span>
+          <span id="item-price" class="ml-2 text-lg font-semibold text-[#0A1E54]">Rp{{ item.price }}</span>
         </p>
       </div>
 
       <!-- Thumbnail -->
       {% if item.thumbnail %}
         <div class="mb-6">
-          <img id="item-thumbnail" src="{{ item.thumbnail }}" 
-               alt="Item thumbnail" 
+          <img id="item-thumbnail" src="{{ item.thumbnail }}"
+               alt="Item thumbnail"
                class="w-full max-w-md rounded-md border border-gray-200 shadow-sm">
         </div>
       {% endif %}
@@ -51,7 +52,7 @@
       <!-- Author -->
       <div class="pt-4 border-t border-gray-200">
         <p class="text-sm text-gray-500">
-          Author: 
+          Author:
           {% if item.user %}
             <span id="item-user" class="font-medium text-gray-800">{{ item.user.username }}</span>
           {% else %}
@@ -60,7 +61,6 @@
         </p>
       </div>
     </div>
-
   </div>
 </div>
 {% endblock content %}
@@ -68,36 +68,30 @@
 {% block scripts %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Ambil ID item dari URL
   const urlParts = window.location.pathname.split("/");
   const itemId = urlParts[urlParts.length - 2]; // /item/<id>/
 
-  // Fetch semua item lewat show_json
   fetch("{% url 'main:show_json' %}")
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
-      // Cari item sesuai ID
       const item = data.find(i => i.id === itemId);
       if (!item) return;
 
-      // Update tampilan
       document.getElementById("item-name").textContent = item.name;
       document.getElementById("item-category").textContent = item.category;
-      document.getElementById("item-price").textContent = "Rp" + item.price_formatted;
-      document.getElementById("item-description").textContent = item.description;
-      document.getElementById("item-user").textContent = item.user_id ?? "Anonymous";
+      document.getElementById("item-price").textContent = "Rp" + (item.price_formatted || item.price);
+      const userEl = document.getElementById("item-user");
+      if (userEl) userEl.textContent = item.user_username || "Anonymous";
 
-      // Thumbnail
       if (item.thumbnail) {
-        const thumb = document.getElementById("item-thumbnail");
-        if (thumb) thumb.src = item.thumbnail;
+        const img = document.getElementById("item-thumbnail");
+        if (img) img.src = item.thumbnail;
       }
 
-      // Featured badge
       if (item.is_featured && !document.getElementById("item-featured")) {
         const badge = document.createElement("span");
         badge.id = "item-featured";
-        badge.className = "ml-2 px-2 py-1 text-xs font-semibold rounded bg-yellow-100 text-yellow-800";
+        badge.className = "ml-2 px-2 py-1 text-xs font-semibold rounded bg-[#B39A84] text-white";
         badge.textContent = "Featured";
         document.getElementById("item-category").after(badge);
       }

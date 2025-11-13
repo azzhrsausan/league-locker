@@ -12,6 +12,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods
 # from main.forms import CarForm
 
 # Create your views here.
@@ -25,11 +26,12 @@ def show_main(request):
         item_list = Item.objects.filter(user=request.user)
 
     context = {
-        'npm' : '2406439091',
+        'npm': '2406439091',
         'name': request.user.username,
         'class': 'PBP D',
         'item_list': item_list,
-        'last_login': request.COOKIES.get('last_login', 'Never')
+        'last_login': request.COOKIES.get('last_login', 'Never'),
+        'form': ItemForm(),
     }
 
     return render(request, "main.html", context)
@@ -63,16 +65,6 @@ def create_item(request):
         'form': form
     }
     return render(request, "create_item.html", context)
-
-# def create_car(request):
-#     form = CarForm(request.POST or None)
-
-#     if form.is_valid() and request.method == "POST":
-#         form.save()
-#         return redirect('main:show_main')
-
-#     context = {'form': form}
-#     return render(request, "create_car.html", context)
 
 @login_required(login_url='/login')
 def show_item(request, id):
@@ -182,7 +174,7 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
-    response = HttpResponseRedirect(reverse('main:login'))
+    response = HttpResponseRedirect(reverse('main:login') + '?logged_out=1')
     response.delete_cookie('last_login')
     return response
 
@@ -213,9 +205,17 @@ def edit_item(request, id):
     context = {'form': form}
     return render(request, "edit_item.html", context)
 
+@csrf_exempt
+@require_http_methods(["POST","GET"])
 def delete_item(request, id):
     item = get_object_or_404(Item, pk=id)
-    item.delete()
+    if request.method == 'POST':
+        item.delete()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success'})
+        return HttpResponseRedirect(reverse('main:show_main'))
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'error', 'detail': 'Invalid method'}, status=405)
     return HttpResponseRedirect(reverse('main:show_main'))
 
 @csrf_exempt
