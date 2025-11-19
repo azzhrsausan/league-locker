@@ -6,6 +6,7 @@ from main.views import logout_user
 from main.views import edit_item
 from main.views import delete_item
 from main.views import add_item_ajax
+from main.views import show_json_user
 
 
 
@@ -27,4 +28,5 @@ urlpatterns = [
     path('create-item-ajax', add_item_ajax, name='add_item_ajax'),
     path('proxy-image/', proxy_image, name='proxy_image'),
     path('create-flutter/', create_item_flutter, name='create_news_flutter'),
+    path('json-user/', show_json_user, name='show_json_user'),
 ]

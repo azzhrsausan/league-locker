@@ -80,9 +80,9 @@ def show_item(request, id):
     return render(request, "item_detail.html", context)
 
 def show_xml(request):
-     item_list = Item.objects.all()
-     xml_data = serializers.serialize("xml", item_list)
-     return HttpResponse(xml_data, content_type="application/xml")
+    item_list = Item.objects.all()
+    xml_data = serializers.serialize("xml", item_list)
+    return HttpResponse(xml_data, content_type="application/xml")
 
 def show_json(request):
     item_list = Item.objects.all()
@@ -103,13 +103,33 @@ def show_json(request):
 
     return JsonResponse(data, safe=False)
 
+@login_required(login_url='/login')
+def show_json_user(request):
+    item_list = Item.objects.filter(user=request.user)
+    data = [
+        {
+            'id': str(item.id),
+            'name': item.name,
+            'price': item.price,
+            'price_formatted': f"{item.price:,}".replace(",", "."),
+            'description': item.description,
+            'category': item.category,
+            'thumbnail': item.thumbnail,
+            'is_featured': item.is_featured,
+            'user_id': item.user_id,
+        }
+        for item in item_list
+    ]
+
+    return JsonResponse(data, safe=False)
+
 def show_xml_by_id(request, item_id):
-   try:
-       item_item = Item.objects.filter(pk=item_id)
-       xml_data = serializers.serialize("xml", item_item)
-       return HttpResponse(xml_data, content_type="application/xml")
-   except Item.DoesNotExist:
-       return HttpResponse(status=404)
+    try:
+        item_item = Item.objects.filter(pk=item_id)
+        xml_data = serializers.serialize("xml", item_item)
+        return HttpResponse(xml_data, content_type="application/xml")
+    except Item.DoesNotExist:
+        return HttpResponse(status=404)
 
 def show_json_by_id(request, item_id):
     try:
